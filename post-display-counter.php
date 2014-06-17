@@ -158,7 +158,7 @@ function pdc_wrap_the_title( $content, $post_id ) {
 	
 	if ( in_the_loop() && $post_id == $post->ID ) {
 		$attr = array(
-			'class = "countable"',
+			'class="countable"',
 			'data-served-id="' . $post->ID . '"'
 		);
 		if ( is_singular() ) {
@@ -178,7 +178,7 @@ function get_countable_title( $post_id ) {
 	if ( get_post( $post_id ) ) {
 		$attr = array(
 			'class = "countable"',
-			'data-served-id="' . $post->ID . '"'
+			'data-served-id="' . $post_id . '"'
 		);
 
 		$content = '<span ' . implode( ' ', $attr ) . '>' . $content . '</span>';
@@ -197,7 +197,7 @@ function count_restore() {
 
 function get_counters( $post_id ) {
 	if ( ! get_post_meta( $post_id, 'pdc_hide_counter', true ) ) {
-		return '<p class="counterdisplay">' . get_counter_served( $post_id ) . ' ' . __( 'served', 'post-display-counter' ) . ' &amp; ' . get_counter_views( $post_id ) . ' ' . __( 'views', 'post-display-counter' ) . '</p>';
+		return '<p class="counterdisplay">' . get_counter_served( $post_id ) . ' ' . __( 'x served', 'post-display-counter' ) . ' &amp; ' . get_counter_views( $post_id ) . ' ' . __( 'x viewed', 'post-display-counter' ) . '</p>';
 	} else {
 		return '';
 	}
