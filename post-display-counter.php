@@ -209,7 +209,7 @@ function get_counter_views( $post_id ) {
 	if ( $post_id == $post->ID && is_singular() ) {
 		return get_post_meta( $post_id, 'pdc_count_views', true ) + 1;
 	} else {
-		return get_post_meta( $post_id, 'pdc_count_views', true );
+		return ( int ) get_post_meta( $post_id, 'pdc_count_views', true );
 	}
 }
 
