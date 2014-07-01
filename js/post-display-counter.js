@@ -28,7 +28,7 @@ function countViews() {
 	}
 }
 
-jQuery(
+jQuery(window).load(
 	countViews
 );
 
@@ -41,18 +41,22 @@ function countServed() {
 	served.each(function(){
 		var countableServed = jQuery(this);
 		
-		if (countableServed.length && jQuery(countableServed[0]).attr('data-served-id')) {
-			var countableServedId = jQuery(countableServed[0]).attr('data-served-id');
+		if (countableServed.length) {
+			for (var i = 0; i < countableServed.length; i++) {
+				if (jQuery(countableServed[i]).attr('data-served-id')) {
+					var countableServedId = jQuery(countableServed[i]).attr('data-served-id');
 
-			if ( ! processed[ countableServedId ] ) {
-				processed[ countableServedId ] = true;
-				
-				var data = {
-					action: 'pdc_count_served',
-					post_id: countableServedId
-				};
+					if ( ! processed[ countableServedId ] ) {
+						processed[ countableServedId ] = true;
+						
+						var data = {
+							action: 'pdc_count_served',
+							post_id: countableServedId
+						};
 
-				jQuery.post(ajax_object.ajax_url, data);
+						jQuery.post(ajax_object.ajax_url, data);
+					}
+				}
 			}
 		}
 	});
