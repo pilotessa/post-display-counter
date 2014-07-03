@@ -10,6 +10,8 @@ define( 'PDC_PLUGIN_VERSION', '1.0' );
 define( 'PDC_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PDC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
+add_action( 'admin_enqueue_scripts', 'pdc_admin_scripts' );
+add_action( 'admin_footer', 'pdc_footer' );
 add_action( 'add_meta_boxes', 'pdc_metaboxes_add' );
 add_action( 'admin_menu', 'pdc_plugin_menu' );
 add_action( 'plugins_loaded', 'pdc_load_translation_file' );
@@ -23,6 +25,25 @@ add_action( 'wp_enqueue_scripts', 'pdc_scripts_and_styles' );
 add_filter( 'the_content', 'pdc_print_counters' );
 add_filter( 'the_title', 'pdc_wrap_the_title', 10, 2 );
 
+function pdc_admin_scripts() {
+	if ( basename( $_SERVER['SCRIPT_FILENAME'] ) == 'plugins.php' && isset( $_GET['page'] ) && $_GET['page'] == 'post-display-counter' ) {
+		wp_enqueue_script( 'jquery-ui-datepicker' );
+		wp_enqueue_style( 'jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css' );
+	}
+}
+
+function pdc_footer() {
+	if ( is_admin() && basename( $_SERVER['SCRIPT_FILENAME'] ) == 'plugins.php' && isset( $_GET['page'] ) && $_GET['page'] == 'post-display-counter' ) {
+		?>
+<script>
+jQuery(function() {
+	jQuery( "#pdc_hide_counters_date" ).datepicker({ dateFormat: 'yy-mm-dd' });
+});
+</script>
+		<?php
+	}
+}
+
 function pdc_plugin_menu() {
 	if ( basename( $_SERVER['SCRIPT_FILENAME'] ) == 'plugins.php' && isset( $_GET['page'] ) && $_GET['page'] == 'post-display-counter' ) {
 		// Check permissions
@@ -31,6 +52,7 @@ function pdc_plugin_menu() {
 		}
 		
 		if ( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' ) {
+			update_option( 'pdc_hide_counters_date', $_POST[ 'pdc_hide_counters_date' ] );
 			update_option( 'pdc_hide_counter_line', $_POST[ 'pdc_hide_counter_line' ] );
 			wp_redirect( home_url( '/wp-admin/plugins.php?page=post-display-counter&saved=true' ) );
 		}
@@ -64,6 +86,11 @@ function pdc_plugin_page() {
 					<tbody>
 						<tr>
 							<td colspan="2"><h3><?php _e( 'General', 'post-display-counter' );?></h3></td>
+						</tr>
+						<tr>
+							<td>
+								<label><?php echo _e( 'Hide counters on posts before', 'post-display-counter' ); ?> <input type="text" name="pdc_hide_counters_date" id="pdc_hide_counters_date" value="<?php echo ( get_option( 'pdc_hide_counters_date' ) ); ?>" /></label>
+							</td>
 						</tr>
 						<tr>
 							<td>
@@ -149,7 +176,7 @@ function pdc_print_counters( $content ) {
 	if ( ! get_option( 'pdc_hide_counter_line' ) ) {
 		$content = get_counters( $post->ID ) . $content;
 	}
-
+	
 	return $content;
 }
 
@@ -196,7 +223,9 @@ function count_restore() {
 }
 
 function get_counters( $post_id ) {
-	if ( ! get_post_meta( $post_id, 'pdc_hide_counter', true ) ) {
+	$post  = get_post( $post_id );
+
+	if ( ! get_post_meta( $post_id, 'pdc_hide_counter', true ) && ! ( get_option( 'pdc_hide_counters_date' ) && strtotime( get_option( 'pdc_hide_counters_date' ) ) / ( 60 * 60 * 24 ) > strtotime( $post->post_date ) / ( 60 * 60 * 24 ) ) ) {
 		return '<p class="counterdisplay">' . get_counter_served( $post_id ) . ' ' . __( 'x served', 'post-display-counter' ) . ' &amp; ' . get_counter_views( $post_id ) . ' ' . __( 'x viewed', 'post-display-counter' ) . '</p>';
 	} else {
 		return '';
