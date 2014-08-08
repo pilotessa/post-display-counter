@@ -28,7 +28,7 @@ add_filter( 'the_title', 'pdc_wrap_the_title', 10, 2 );
 function pdc_admin_scripts() {
 	if ( basename( $_SERVER['SCRIPT_FILENAME'] ) == 'plugins.php' && isset( $_GET['page'] ) && $_GET['page'] == 'post-display-counter' ) {
 		wp_enqueue_script( 'jquery-ui-datepicker' );
-		wp_enqueue_style( 'jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css' );
+		wp_enqueue_style( 'jquery-ui-custom', PDC_PLUGIN_URL . 'css/jquery-ui-1.8.16.custom.css' );
 	}
 }
 
